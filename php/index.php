@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prompt'])) {
             <!-- Chat messages will appear here -->
         </div>
         <form id="chat-form" method="post">
-            <textarea id="prompt" name="prompt" placeholder="Your message" required></textarea>
+            <textarea id="prompt" name="prompt" placeholder="Ta oe parau" required></textarea>
             <button type="submit">Tukua</button>
         </form>
         <!-- Buttons for additional functionalities -->
