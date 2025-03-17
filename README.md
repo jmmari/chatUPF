@@ -1,5 +1,5 @@
 # chatUPF
-Un docker chat avec "Nous-Hermes-2-Mistral-7B-DPO"
+Un Docker de chat' avec "Māui" (Nous-Hermes-2-Mistral-7B-DPO).
 
 Le modèle n'est pas inclus pour alléger le projet, mais le répertoire 'models' est créé pour la mise en cache; la première fois, le modèle est téléchargé automatiquement au démarrage.
 
