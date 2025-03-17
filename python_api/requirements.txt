@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+torch
+transformers
+bitsandbytes
+sentencepiece
+flash-attn
+packaging
+accelerate>=0.26.0
+

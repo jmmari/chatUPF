@@ -1,0 +1,92 @@
+<?php
+session_start();
+
+// Initialiser la conversation si elle n'existe pas
+if (!isset($_SESSION['conversation'])) {
+    $_SESSION['conversation'] = "<|im_start|>system\nYou are a sentient, superintelligent artificial general intelligence, here to teach and assist me.\n<|im_end|>\n";
+}
+
+// Si une requête AJAX est envoyée avec un nouveau prompt
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prompt'])) {
+    $prompt = $_POST['prompt'];
+    // Ajouter le prompt de l'utilisateur à la conversation
+    $_SESSION['conversation'] .= "<|im_start|>user\n" . $prompt . "\n<|im_end|>\n";
+
+    // Préparez le payload pour l'API Python
+    $payload = [
+        'conversation' => $_SESSION['conversation'],
+        'prompt' => $prompt
+    ];
+    $ch = curl_init("http://python_api:8000/chat"); // Remplacez "python_api" par le nom du service défini dans docker-compose
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+    $assistant_response = $data['response'] ?? '';
+
+    // Ajouter la réponse de l'assistant au contexte
+    $_SESSION['conversation'] .= "<|im_start|>assistant\n" . $assistant_response . "\n<|im_end|>\n";
+
+    // Retourner la réponse en JSON
+    header('Content-Type: application/json');
+    echo json_encode(['response' => $assistant_response]);
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation with Hermes</title>
+    <style>
+        /* Styles simples pour simuler une interface de messagerie */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .chat-box { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+        .message { margin-bottom: 10px; }
+        .user { text-align: right; color: blue; }
+        .assistant { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+    <h1>Conversation with Hermes</h1>
+    <div class="chat-box" id="chat-box">
+        <!-- Ici vous pouvez charger l'historique de la conversation depuis $_SESSION si nécessaire -->
+    </div>
+    <form id="chat-form">
+        <input type="text" id="prompt" placeholder="Your message" style="width:80%;" required>
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const promptInput = document.getElementById('prompt');
+        const chatBox = document.getElementById('chat-box');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const promptText = promptInput.value;
+            // Afficher le message de l'utilisateur
+            chatBox.innerHTML += `<div class="message user"><strong>You:</strong> ${promptText}</div>`;
+            promptInput.value = '';
+
+            // Envoyer le prompt à l'API via AJAX
+            fetch('', {  // On POST vers la même page
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ prompt: promptText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const assistantText = data.response;
+                chatBox.innerHTML += `<div class="message assistant"><strong>Assistant:</strong> ${assistantText}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
