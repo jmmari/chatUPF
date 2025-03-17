@@ -5,6 +5,7 @@ Le modèle n'est pas inclus pour alléger le projet, mais le répertoire 'models
 
 Une fois lancé, attendez quelques minutes pour que le modèle soit prêt, et si vous le lancez pour la première fois, il vous faudra un bon quart d'heure en haut débit (50Mbits/s) pour le télécharger. 
 
+Pour accéder à la discussion, allez à "http://localhost:8080/"
+
 Ce projet Docker est fourni tel quel, sans garanties aucunes. 
 
-Pour accéder à la discussion, allez à "http://localhost:8080/"
